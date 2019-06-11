@@ -33,4 +33,14 @@ public class UserController {
 	public String callAsyncMethosWithChildAsync(@RequestParam int taskCount) throws InterruptedException, ExecutionException {
 		return userService.callAllAsyncMethodWithChildAsync(taskCount).get();
 	}
+	
+	@GetMapping("testcase1")
+	public String callAsyncMethosWithChildOfChildAsync(@RequestParam int userCount, @RequestParam int requestCount, @RequestParam int roundCount) throws InterruptedException, ExecutionException {
+		return userService.callAllAsyncMethodWithChildOfChildAsync(userCount,requestCount,roundCount).get();
+	}
+	
+	@GetMapping("testcase2")
+	public String callSyncMethosWithChildOfChildAsync(@RequestParam int userCount, @RequestParam int requestCount, @RequestParam int roundCount) throws InterruptedException, ExecutionException {
+		return userService.callAllSyncMethodWithChildOfChildAsync(userCount,requestCount,roundCount);
+	}
 }

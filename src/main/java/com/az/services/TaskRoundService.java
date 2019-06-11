@@ -38,7 +38,7 @@ public class TaskRoundService {
 		return CompletableFuture.completedFuture(this.roundC());
 	}
 
-	private String roundA() {
+	public String roundA() {
 		User user = this.saveUser(new User("Azhar", "Blog"));
 		this.updateUser(user.getId(), new User("Mr. Azhar", "Java"));
 		this.displayUser(user.getId());
@@ -49,7 +49,7 @@ public class TaskRoundService {
 		return "Round A Completed!";
 	}
 
-	private String roundB() {
+	public String roundB() {
 		User user = this.saveUser(new User("Usama", "Blog"));
 		this.updateUser(user.getId(), new User("Mr. Usama", "Java"));
 		this.displayUser(user.getId());
@@ -64,7 +64,7 @@ public class TaskRoundService {
 		return "Round B Completed!";
 	}
 
-	private String roundC() {
+	public String roundC() {
 		User user = this.saveUser(new User("Zaeem", "Blog"));
 		this.updateUser(user.getId(), new User("Mr. Zaeem", "Java"));
 		this.displayUser(user.getId());

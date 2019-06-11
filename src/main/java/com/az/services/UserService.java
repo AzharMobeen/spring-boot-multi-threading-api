@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,9 @@ public class UserService {
 
     private final TaskRoundService taskRoundService;
     private final UserRepository userRepository;
+    
+    @Autowired
+    private RequestService requestService;
     
     public UserService(UserRepository userRepository,TaskRoundService taskRoundService) {
         this.taskRoundService = taskRoundService;
@@ -48,14 +52,15 @@ public class UserService {
     @Async
     public CompletableFuture<String> callAllAsyncMethodWithChildAsync(int taskCount) throws InterruptedException, ExecutionException {
     	long startTime = System.currentTimeMillis();
-    	List<CompletableFuture<String>> completable = new ArrayList<>();
+    	
     	for(int index = 0; index<taskCount;index++) {
-    		CompletableFuture<String> roundA = taskRoundService.asyncRoundA();
-    		completable.add(roundA);
+    		CompletableFuture<String> roundA = taskRoundService.asyncRoundA();    	
+    		//roundA.join();
     		CompletableFuture<String> roundB = taskRoundService.asyncRoundB();
-    		completable.add(roundB);
+    		//roundB.join();
     		CompletableFuture<String> roundC = taskRoundService.asyncRoundC();
-    		completable.add(roundC);
+    		//roundC.join();
+    		CompletableFuture.allOf(roundA,roundB,roundC).join();    		
     	}
     	   	
     	long endTime = System.currentTimeMillis();
@@ -151,5 +156,42 @@ public class UserService {
 	}
 	private User saveUser(User user) {
 		return userRepository.save(user);		
+	}
+
+	
+	public CompletableFuture<String> callAllAsyncMethodWithChildOfChildAsync(int userCount, int requestCount,
+			int roundCount) {
+		long startTime = System.currentTimeMillis();    			
+		List<CompletableFuture<String>> result = new ArrayList<>();
+		for(int user= 1; user<=userCount;user++) {
+			List<CompletableFuture<String>> temp;
+			try {
+				temp = requestService.requestCountProcess(requestCount,roundCount);
+				result.addAll(temp);
+			} catch (InterruptedException | ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		/*result.forEach(completableFuture->{
+			completableFuture.join();			
+		});*/
+		long endTime = System.currentTimeMillis();
+		return CompletableFuture.completedFuture("Task Execution Time with threads :: "+( endTime-startTime));
+	}
+
+
+	public String callAllSyncMethodWithChildOfChildAsync(int userCount, int requestCount,
+			int roundCount) {
+		long startTime = System.currentTimeMillis();    			
+		List<String> result = new ArrayList<>();
+		for(int user= 1; user<=userCount;user++) {
+			result.addAll(requestService.requestCountProcess2(requestCount,roundCount));
+		}		
+		long endTime = System.currentTimeMillis();
+		return "Task Execution Time with threads :: "+( endTime-startTime);
+		
 	}	       
 }
